@@ -2,7 +2,7 @@
 
 class App
 {
-    public static function curlRequest($url, $method, $headers, $body = null)
+    public static function curlRequest($url, $method, $headers, $body = null, $cookieFilePath = 'cookie.txt', $proxy = null)
     {
         App::saveLog($body);
 
@@ -12,8 +12,9 @@ class App
         curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_COOKIEJAR, 'cookie.txt');
-        curl_setopt($ch, CURLOPT_COOKIEFILE, 'cookie.txt');
+        curl_setopt($ch, CURLOPT_PROXY, $proxy);
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $cookieFilePath);
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $cookieFilePath);
         // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         $response = curl_exec($ch);
@@ -32,9 +33,9 @@ class App
         file_put_contents('debug.log', $message . PHP_EOL, FILE_APPEND);
     }
 
-    public static function resetCookie()
+    public static function resetCookie($cookieFilePath = 'cookie.txt')
     {
-        file_put_contents('cookie.txt', '');
+        file_put_contents($cookieFilePath, '');
     }
 
     public static function subString($haystack, $start, $end)
@@ -61,5 +62,13 @@ class App
 
         // Generate angka acak
         return mt_rand($min, $max);
+    }
+
+    public static function getProxyList()
+    {
+        $proxyListRaw = file_get_contents(__DIR__ . '/proxies.txt');
+        $proxyList = explode(PHP_EOL, $proxyListRaw);
+
+        return $proxyList;
     }
 }
