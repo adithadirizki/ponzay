@@ -148,6 +148,43 @@ class Bot
         return $friends;
     }
 
+    public function getWithdraw()
+    {
+        $url = "{$this->baseUrl}/my/withdraw/json/?page=1";
+        $method = 'GET';
+        $body = null;
+
+        $response = App::curlRequest($url, $method, $this->headers, $body, $this->cookieFilePath, $this->proxy);
+
+        $responseObject = json_decode($response);
+
+        $message = '';
+        $data = empty($responseObject->data) ? [] : $responseObject->data;
+
+        foreach ($data as $item) {
+            $message .= "[$item->add_time_str] {$item->money} >> {$item->withdraw_type_str} - {$item->status_str} - {$item->withdraw_account}" . PHP_EOL;
+            // break;
+        }
+
+        return $message;
+    }
+
+    public function withdraw()
+    {
+        $url = "{$this->baseUrl}/withdraw/index/post/39e0dc4631813a99461b09c3d52f6be6/";
+        $method = 'POST';
+
+        $withdrawAccount = '';
+        $money = '100000';
+        $withdrawArrive = '95000';
+
+        $body = "withdraw_type=BRI&withdraw_name=Godamaru&withdraw_account=88810085764540780&money=96000&withdraw_arrive=91200";
+
+        $response = App::curlRequest($url, $method, $this->headers, $body, $this->cookieFilePath, $this->proxy);
+
+        return $response;
+    }
+
     public function checkin()
     {
         $url = "{$this->baseUrl}/task/index/clockin/";
@@ -258,12 +295,15 @@ class Bot
 
             $responseGetReferralCode = $this->getReferralCode();
 
+            $responseGetWithdraw = $this->getWithdraw();
+
             echo "Phone Number: " . $phoneNumber . PHP_EOL;
             echo "Balance     : " . $responseGetBalance . PHP_EOL;
             echo "Order Time  : " . $responseGetOrder . PHP_EOL;
             echo "Friends     : " . $responseGetTeam . PHP_EOL;
             echo "Reff Code   : " . $responseGetReferralCode . PHP_EOL;
-            echo "======================" . PHP_EOL;
+            echo "Withdraw    : " . PHP_EOL . $responseGetWithdraw;
+            echo "============================================" . PHP_EOL;
         }
     }
 }
